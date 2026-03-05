@@ -194,7 +194,7 @@ export const useNotesStore = create<NotesState>()(
       addNote: (noteData) => {
         const note: Note = {
           ...noteData,
-          id: `note-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           versions: [],
@@ -236,7 +236,7 @@ export const useNotesStore = create<NotesState>()(
         if (!note) return;
         const newNote: Note = {
           ...note,
-          id: `note-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
           title: `${note.title} (copy)`,
           isPinned: false,
           createdAt: new Date().toISOString(),

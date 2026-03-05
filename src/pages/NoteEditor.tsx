@@ -75,14 +75,15 @@ export function NoteEditor() {
     return () => window.removeEventListener('keydown', handler);
   }, [save, addToast]);
 
-  // AI suggestions
+  // Run AI suggestions when content becomes substantial enough
+  const contentSnippet = content.length > 30 ? content.slice(0, 100) : '';
   useEffect(() => {
-    if (content.length > 30) {
-      const suggested = autoTag(title, content);
-      setAiSuggestions(suggested.filter(t => !tags.includes(t)).slice(0, 3));
-      if (!subject) setSubject(suggestSubject(title, content));
-    }
-  }, [content.length > 30 ? content.slice(0, 100) : '']);
+    if (!contentSnippet) return;
+    const suggested = autoTag(title, contentSnippet);
+    setAiSuggestions(suggested.filter(t => !tags.includes(t)).slice(0, 3));
+    if (!subject) setSubject(suggestSubject(title, contentSnippet));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contentSnippet]);
 
   if (!note) return null;
 
