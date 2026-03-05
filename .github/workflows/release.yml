@@ -1,5 +1,3 @@
-# Release Workflow for QuickNotes
-
 name: Release
 
 on:
@@ -7,36 +5,41 @@ on:
     tags:
       - 'v*.*.*'
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  create-release:
+    name: Create GitHub Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
-      - name: Install dependencies
-        run: |
-          npm install
-
-      - name: Build for all platforms
-        run: |
-          npm run build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: QuickNotes-Build
-          path: path/to/build/artifacts
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref }}
-          files: path/to/build/artifacts/*
+          name: QuickNotes ${{ steps.version.outputs.VERSION }}
+          body: |
+            # QuickNotes ${{ steps.version.outputs.VERSION }}
+            
+            🎉 QuickNotes Release
+            
+            ## Features
+            ✅ Full-stack note-taking application
+            ✅ AI-powered text extraction
+            ✅ React 18 + Vite frontend
+            ✅ Express.js backend
+            ✅ SQLite database
+            
+            ## Installation
+            See [INSTALL.md](https://github.com/${{ github.repository }}/blob/main/INSTALL.md)
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
