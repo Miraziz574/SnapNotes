@@ -1,0 +1,214 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  # ──────────────────────────────────────────────
+  # macOS – universal .dmg (Intel + Apple Silicon)
+  # ──────────────────────────────────────────────
+  build-mac:
+    name: Build macOS installer
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build macOS DMG
+        run: npm run build:mac
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-dmg
+          path: dist/*.dmg
+
+  # ──────────────────────────────────────────────
+  # Windows – x64 NSIS installer .exe
+  # ──────────────────────────────────────────────
+  build-windows:
+    name: Build Windows installer
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Windows EXE
+        run: npm run build:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe
+          path: dist/*-setup.exe
+
+  # ──────────────────────────────────────────────
+  # Android – release APK
+  # ──────────────────────────────────────────────
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Android APK
+        run: npm run build:android
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: android/app/build/outputs/apk/release/*.apk
+
+  # ──────────────────────────────────────────────
+  # GitHub Release – attach all installers
+  # ──────────────────────────────────────────────
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build-mac, build-windows, build-android]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download macOS DMG
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-dmg
+          path: release-assets
+
+      - name: Download Windows EXE
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-exe
+          path: release-assets
+
+      - name: Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: release-assets
+
+      - name: Compute version (strip leading 'v')
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Rename assets to canonical names
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          cd release-assets
+          # macOS
+          DMG=$(ls *.dmg 2>/dev/null | head -1)
+          [ -n "$DMG" ] && mv "$DMG" "QuickNotes-${VERSION}-universal.dmg"
+          # Windows
+          EXE=$(ls *-setup.exe 2>/dev/null | head -1)
+          [ -n "$EXE" ] && mv "$EXE" "QuickNotes-${VERSION}-x64-setup.exe"
+          # Android
+          APK=$(ls *.apk 2>/dev/null | head -1)
+          [ -n "$APK" ] && mv "$APK" "QuickNotes-${VERSION}-release.apk"
+          ls -lh
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: QuickNotes ${{ github.ref_name }}
+          body: |
+            ## QuickNotes ${{ github.ref_name }}
+
+            Download the installer for your platform below.
+
+            ---
+
+            ### ⬇️ Downloads
+
+            | Platform | File |
+            |----------|------|
+            | 🖥️ macOS (Universal – M1/M2 + Intel) | `QuickNotes-*-universal.dmg` |
+            | 🪟 Windows (x64) | `QuickNotes-*-x64-setup.exe` |
+            | 📱 Android | `QuickNotes-*-release.apk` |
+
+            ---
+
+            ### 🖥️ macOS Installation
+            1. Download `QuickNotes-${{ steps.version.outputs.version }}-universal.dmg`
+            2. Open the DMG file
+            3. Drag **QuickNotes** to the **Applications** folder
+            4. Launch from Applications (right-click → Open the first time)
+
+            ### 🪟 Windows Installation
+            1. Download `QuickNotes-${{ steps.version.outputs.version }}-x64-setup.exe`
+            2. Double-click to run the installer
+            3. Follow the installation wizard
+            4. A desktop shortcut is created automatically
+
+            ### 📱 Android Installation
+            1. Download `QuickNotes-${{ steps.version.outputs.version }}-release.apk`
+            2. Transfer to your Android device (or download directly on device)
+            3. Open **Files** app → tap the APK
+            4. Allow *Install from unknown sources* when prompted
+            5. Tap **Install**
+
+            ---
+
+            ### System Requirements
+            | Platform | Minimum |
+            |----------|---------|
+            | macOS | 11 Big Sur or later |
+            | Windows | Windows 10 (64-bit) or later |
+            | Android | Android 8.0 (API 26) or later |
+
+            ---
+
+            See [INSTALL.md](https://github.com/${{ github.repository }}/blob/main/INSTALL.md) for detailed installation guides and troubleshooting.
+
+            **Support:** open an issue at https://github.com/${{ github.repository }}/issues
+          files: release-assets/**
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
