@@ -1,28 +1,35 @@
 # Node modules
 node_modules/
 
-# Environment variables
+# Environment files
 .env
-
-# Database files
-*.db
-
-# Uploads
-uploads/
-
-# Distribution files
-dist/
-
-# IDE files
-*.idea/
-*.vscode/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Testing files
-coverage/
+.env.local
 
 # Build outputs
-build/
+/dist/
+/build/
+
+# macOS specific files
+.DS_Store
+
+# Log files
+*.log
+
+# Next.js build outputs
+.next/
+
+# VSCode settings
+.vscode/
+
+# IntelliJ IDEA settings
+.idea/
+
+# Test coverage
+coverage/
+
+# Turbo templates
+.turbo/
+
+dist-tauri/
+
+/android/app/build/
