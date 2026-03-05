@@ -1,40 +1,43 @@
-# QuickNotes App Documentation
-
-## Overview
-QuickNotes is a powerful note-taking application that leverages the full capabilities of React, Vite, and Tailwind CSS. It provides users with a rich interface to capture and manage notes effectively.
+# QuickNotes Documentation
 
 ## Features
-- **Dashboard**: A user-friendly dashboard to manage and view all your notes.
-- **Note Editor**: An intuitive editor for creating and modifying notes.
-- **Camera/OCR**: Capture notes using your camera or extract text from images using Optical Character Recognition.
-- **Search**: Quickly find your notes with a search feature.
-- **Export**: Easily export your notes in various formats.
-- **Dark Mode**: Switch between light and dark themes for better readability in different lighting.
-- **6 Themes**: Choose from six different themes to customize your interface.
-- **PWA Support**: Installable as a Progressive Web App for offline use and improved performance.
+- Feature 1: Brief description of feature 1.
+- Feature 2: Brief description of feature 2.
+- Feature 3: Brief description of feature 3.
+
+## Tech Stack
+- Language: e.g., JavaScript
+- Framework: e.g., React
+- Database: e.g., MongoDB
 
 ## Installation
-To get started with QuickNotes, follow these steps:
 1. Clone the repository:
    ```bash
    git clone https://github.com/Miraziz574/SnapNotes.git
+   ```
+2. Navigate to the project directory:
+   ```bash
    cd SnapNotes
    ```
-2. Install the dependencies:
+3. Install dependencies:
    ```bash
    npm install
    ```
-3. Run the application:
-   ```bash
-   npm run dev
-   ```
 
 ## Usage
-Once the application is running, you can:
-- Create new notes using the Note Editor.
-- Access the dashboard to see all your notes.
-- Utilize the search feature to find specific notes.
-- Export your notes to save or share them.
-- Change themes and toggle dark mode for a personalized experience.
+- Run the application:
+  ```bash
+  npm start
+  ```  
+- Open your browser and go to: `http://localhost:3000`
 
-With QuickNotes, managing your notes is easier and more efficient than ever!
+## API Endpoints
+- `GET /api/notes`: Retrieve all notes.
+- `POST /api/notes`: Create a new note.
+- `PUT /api/notes/:id`: Update a note by ID.
+- `DELETE /api/notes/:id`: Delete a note by ID.
+
+## Deployment Instructions
+1. Choose a platform (e.g., Heroku, Vercel)
+2. Follow the specific instructions to deploy your application.
+3. Ensure environment variables are set, if required.
