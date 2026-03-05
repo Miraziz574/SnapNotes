@@ -1,6 +1,28 @@
+# Node modules
 node_modules/
+
+# Environment variables
 .env
-.env.local
+
+# Database files
 *.db
+
+# Uploads
 uploads/
+
+# Distribution files
 dist/
+
+# IDE files
+*.idea/
+*.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing files
+coverage/
+
+# Build outputs
+build/
