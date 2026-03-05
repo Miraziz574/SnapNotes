@@ -2,14 +2,18 @@ import express from 'express'
 import multer, { memoryStorage } from 'multer'
 import fs from 'fs'
 import path from 'path'
+import rateLimit from 'express-rate-limit'
 import { getAllNotes, getNotesBySubject, createNote, getAllSubjects, deleteNote, getNoteById } from '../db.js'
 import { extractTextAndSubject } from '../gemini.js'
 
 const router = express.Router()
 const upload = multer({ storage: memoryStorage() })
 
+const captureLimit = rateLimit({ windowMs: 60 * 1000, max: 20, standardHeaders: true, legacyHeaders: false })
+const deleteLimit = rateLimit({ windowMs: 60 * 1000, max: 60, standardHeaders: true, legacyHeaders: false })
+
 // POST /api/notes/capture
-router.post('/capture', upload.single('photo'), async (req, res) => {
+router.post('/capture', captureLimit, upload.single('photo'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No photo uploaded' })
@@ -62,7 +66,7 @@ router.get('/filter/:subject', (req, res) => {
 })
 
 // DELETE /api/notes/:id
-router.delete('/:id', (req, res) => {
+router.delete('/:id', deleteLimit, (req, res) => {
   try {
     const note = getNoteById(Number(req.params.id))
     const result = deleteNote(Number(req.params.id))
