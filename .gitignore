@@ -2,3 +2,22 @@ node_modules
 dist
 .DS_Store
 *.local
+
+# Tauri build outputs
+src-tauri/target/
+
+# Android build outputs
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/app/keystore.jks
+
+# Capacitor
+.capacitor/
+
+# Environment / secrets
+.env
+.env.local
+*.jks
+*.keystore
