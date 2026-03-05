@@ -75,7 +75,7 @@ router.delete('/:id', deleteLimit, (req, res) => {
     }
     if (note && note.image_filename) {
       const imgPath = path.join('./uploads', note.image_filename)
-      fs.unlink(imgPath, () => {})
+      fs.unlink(imgPath, (err) => { if (err) console.error('Failed to delete image:', err) })
     }
     res.json({ success: true })
   } catch (err) {
