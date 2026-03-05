@@ -1,37 +1,40 @@
 # QuickNotes App Documentation
 
 ## Overview
-The QuickNotes app is a sophisticated note-taking application that allows users to create, manage, and organize notes efficiently. This documentation provides comprehensive information about app features, usage, and troubleshooting.
+QuickNotes is a powerful note-taking application that leverages the full capabilities of React, Vite, and Tailwind CSS. It provides users with a rich interface to capture and manage notes effectively.
 
 ## Features
-- **Create Notes**: Users can easily create new notes with a simple interface.
-- **Edit Notes**: Existing notes can be edited at any time to update information.
-- **Delete Notes**: Notes can be permanently deleted.
-- **Search Functionality**: Users can search through their notes using keywords.
-- **Categories**: Organize notes into different categories for better management.
+- **Dashboard**: A user-friendly dashboard to manage and view all your notes.
+- **Note Editor**: An intuitive editor for creating and modifying notes.
+- **Camera/OCR**: Capture notes using your camera or extract text from images using Optical Character Recognition.
+- **Search**: Quickly find your notes with a search feature.
+- **Export**: Easily export your notes in various formats.
+- **Dark Mode**: Switch between light and dark themes for better readability in different lighting.
+- **6 Themes**: Choose from six different themes to customize your interface.
+- **PWA Support**: Installable as a Progressive Web App for offline use and improved performance.
 
-## Getting Started
-1. **Installation**: Clone the repository using:
+## Installation
+To get started with QuickNotes, follow these steps:
+1. Clone the repository:
    ```bash
    git clone https://github.com/Miraziz574/SnapNotes.git
+   cd SnapNotes
    ```
-2. **Dependencies**: Ensure all dependencies are installed using:
+2. Install the dependencies:
    ```bash
    npm install
    ```
-3. **Run the App**: Start the application using:
+3. Run the application:
    ```bash
-   npm start
+   npm run dev
    ```
 
 ## Usage
-- To create a new note, click on the 'New Note' button and enter the note content.
-- To edit a note, select the note and click 'Edit'. Make your changes and save.
-- Use the search bar to quickly find notes containing specific keywords.
+Once the application is running, you can:
+- Create new notes using the Note Editor.
+- Access the dashboard to see all your notes.
+- Utilize the search feature to find specific notes.
+- Export your notes to save or share them.
+- Change themes and toggle dark mode for a personalized experience.
 
-## Troubleshooting
-- If you encounter issues, check the console for error messages.
-- Ensure all dependencies are correctly installed.
-
-## Conclusion
-The QuickNotes app provides a robust note-taking solution with rich features. We welcome contributions and suggestions.
+With QuickNotes, managing your notes is easier and more efficient than ever!
