@@ -1,1 +1,1 @@
-{ "name": "QuickNotes", "version": "1.0.0", "description": "Your quick notes app", "main": "index.js", "scripts": { "test": "echo \"Error: no test specified\" && exit 1" }, "author": "Miraziz574", "license": "ISC" }
+{\n  "name": "QuickNotes",\n  "version": "1.0.0",\n  "description": "A new note-taking application",\n  "main": "index.js",\n  "scripts": {\n    "test": "echo 'Error: no test specified' && exit 1"\n  },\n  "author": "Your Name",\n  "license": "ISC"\n}
