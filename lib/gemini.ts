@@ -51,9 +51,26 @@ export async function extractTextFromImage(
     };
   } catch (error) {
     console.error('Gemini extraction error:', error);
-    return {
-      text: 'Failed to extract text from image. Please try again.',
-      subject: 'General',
-    };
+
+    // Surface a more specific message depending on the error type
+    let message = 'Failed to extract text from image. Please try again.';
+    if (error instanceof Error) {
+      if (
+        error.message.includes('API_KEY') ||
+        error.message.includes('PERMISSION_DENIED') ||
+        error.message.includes('401') ||
+        error.message.includes('403')
+      ) {
+        message = 'Invalid Gemini API key. Please check your GEMINI_API_KEY in .env.local.';
+      } else if (
+        error.message.includes('MODEL') ||
+        error.message.includes('not found') ||
+        error.message.includes('404')
+      ) {
+        message = 'Gemini model unavailable. The model may have changed — please update the configuration.';
+      }
+    }
+
+    return { text: message, subject: 'General' };
   }
 }

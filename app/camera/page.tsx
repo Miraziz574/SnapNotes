@@ -53,14 +53,49 @@ export default function CameraPage() {
   }, [facingMode]);
 
   useEffect(() => {
-    void startCamera();
+    let cancelled = false;
+
+    async function initCamera() {
+      // Stop any leftover stream
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false,
+        });
+        if (cancelled) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+        setState('streaming');
+      } catch (err) {
+        if (cancelled) return;
+        console.error('Camera error:', err);
+        setError(
+          err instanceof Error && err.name === 'NotAllowedError'
+            ? 'Camera permission denied. Please allow camera access and try again.'
+            : 'Unable to access camera. Make sure your device has a camera and try again.'
+        );
+        setState('error');
+      }
+    }
+
+    void initCamera();
+
     return () => {
+      cancelled = true;
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((t) => t.stop());
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // Runs once on mount; camera flip and retake call startCamera directly
 
   const handleCapture = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;

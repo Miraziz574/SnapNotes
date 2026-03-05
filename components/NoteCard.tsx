@@ -35,8 +35,8 @@ function getSubjectColor(subject: string): string {
 
 function formatRelativeTime(dateStr: string): string {
   // SQLite stores datetime() in UTC; replace space separator to produce a valid ISO string
-  const normalised = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
-  const date = new Date(normalised.endsWith('Z') ? normalised : normalised + 'Z');
+  const normalized = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
+  const date = new Date(normalized.endsWith('Z') ? normalized : normalized + 'Z');
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffSec = Math.floor(diffMs / 1000);

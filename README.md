@@ -1,6 +1,6 @@
 # QuickNotes
 
-A production-ready, iOS/macOS-style notes application with AI-powered text extraction. Capture images of handwritten notes, textbooks, or whiteboards, and QuickNotes uses Google Gemini AI to extract the text and organize it by subject.
+A polished, iOS/macOS-style notes application with AI-powered text extraction. Capture images of handwritten notes, textbooks, or whiteboards, and QuickNotes uses Google Gemini AI to extract the text and organize it by subject.
 
 ## Features
 
