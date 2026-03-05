@@ -25,7 +25,7 @@ export function autoTag(title: string, content: string): string[] {
   });
 
   const tags = Object.entries(wordFreq)
-    .filter(([, count]) => count >= 1 && !['note', 'notes', 'write', 'written'].includes(''))
+    .filter(([word, count]) => count >= 1 && !['note', 'notes', 'write', 'written'].includes(word))
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
     .map(([word]) => word);
