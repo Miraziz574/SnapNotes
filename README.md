@@ -1,51 +1,47 @@
-# QuickNotes
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+.yarn/install-state.gz
 
-Your quick, lightweight notes app for macOS, Windows, and Android.
+# Testing and Coverage
+/coverage
 
----
+# Next.js and Build Outputs
+/.next/
+/out/
+/build/
+/dist/
+.turbo/
+dist-tauri/
+/android/app/build/
 
-## ⬇️ Download
+# Local Environment Files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
 
-| Platform | Installer | Requirements |
-|----------|-----------|--------------|
-| 🖥️ **macOS** (Universal) | [QuickNotes-1.0.0-universal.dmg](../../releases/latest) | macOS 11+ · Intel & Apple Silicon |
-| 🪟 **Windows** (x64) | [QuickNotes-1.0.0-x64-setup.exe](../../releases/latest) | Windows 10 (64-bit)+ |
-| 📱 **Android** | [QuickNotes-1.0.0-release.apk](../../releases/latest) | Android 8.0+ |
+# Databases
+*.db
+*.db-shm
+*.db-wal
 
-> All installers are attached to the [latest release](../../releases/latest).
+# IDEs and OS Files
+.DS_Store
+.vscode/
+.idea/
 
----
+# Logs and Debugging
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-## 🚀 Quick Install
-
-### macOS
-1. Download `QuickNotes-1.0.0-universal.dmg`
-2. Open the DMG and drag **QuickNotes** to **Applications**
-3. Launch from Applications
-
-### Windows
-1. Download `QuickNotes-1.0.0-x64-setup.exe`
-2. Run the installer and follow the wizard
-3. Launch from the desktop shortcut
-
-### Android
-1. Download `QuickNotes-1.0.0-release.apk`
-2. Open the APK on your device and tap **Install**
-3. Allow installation from unknown sources when prompted
-
-See [INSTALL.md](INSTALL.md) for detailed instructions, screenshots, FAQ, and troubleshooting.
-
----
-
-## 🛠️ Build from Source
-
-```bash
-npm install
-npm run build       # build for the current platform
-```
-
----
-
-## 📋 License
-
-ISC © [Miraziz574](https://github.com/Miraziz574)
+# Misc / Tooling
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+*.pem

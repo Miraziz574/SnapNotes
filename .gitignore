@@ -1,0 +1,35 @@
+# Node modules
+node_modules/
+
+# Environment files
+.env
+.env.local
+
+# Build outputs
+/dist/
+/build/
+
+# macOS specific files
+.DS_Store
+
+# Log files
+*.log
+
+# Next.js build outputs
+.next/
+
+# VSCode settings
+.vscode/
+
+# IntelliJ IDEA settings
+.idea/
+
+# Test coverage
+coverage/
+
+# Turbo templates
+.turbo/
+
+dist-tauri/
+
+/android/app/build/
