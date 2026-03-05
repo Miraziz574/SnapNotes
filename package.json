@@ -1,1 +1,43 @@
-{ "name": "QuickNotes", "version": "1.0.0", "description": "Your quick notes app", "main": "index.js", "scripts": { "test": "echo \"Error: no test specified\" && exit 1" }, "author": "Miraziz574", "license": "ISC" }
+{
+  "name": "QuickNotes",
+  "version": "1.0.0",
+  "description": "Your quick notes app",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "tauri:build:mac": "tauri build --target universal-apple-darwin",
+    "tauri:build:windows": "tauri build --target x86_64-pc-windows-msvc",
+    "android:sync": "npx cap sync android",
+    "android:build": "npx cap sync android && cd android && ./gradlew assembleRelease",
+    "android:build:debug": "npx cap sync android && cd android && ./gradlew assembleDebug",
+    "android:open": "npx cap open android",
+    "android:run": "npx cap run android",
+    "test": "echo \"No tests configured\" && exit 0"
+  },
+  "author": "Miraziz574",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "@tauri-apps/api": "^1.6.0",
+    "@capacitor/core": "^5.5.1",
+    "@capacitor/cli": "^5.5.1",
+    "@capacitor/android": "^5.5.1",
+    "@capacitor/camera": "^5.0.9",
+    "@capacitor/filesystem": "^5.1.4",
+    "@capacitor/local-notifications": "^5.0.7",
+    "@capacitor/splash-screen": "^5.0.7"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "@tauri-apps/cli": "^1.6.0"
+  }
+}

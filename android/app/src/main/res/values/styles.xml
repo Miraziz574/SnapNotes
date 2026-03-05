@@ -1,0 +1,16 @@
+<resources>
+    <!-- Base application theme -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">#2d3748</item>
+        <item name="colorPrimaryDark">#1a202c</item>
+        <item name="colorAccent">#4a6cf7</item>
+        <item name="android:windowBackground">@color/windowBackground</item>
+    </style>
+
+    <!-- Splash screen theme (used before Capacitor loads) -->
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:background">@null</item>
+    </style>
+</resources>
