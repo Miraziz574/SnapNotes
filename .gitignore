@@ -1,6 +1,26 @@
 node_modules/
 .env
+.env.local
+*.local
 backend/snapnotes.db
 backend/uploads/
 frontend/dist/
+dist/
 .DS_Store
+
+# Tauri build outputs
+src-tauri/target/
+
+# Android build outputs
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/app/keystore.jks
+
+# Capacitor
+.capacitor/
+
+# Secrets / signing
+*.jks
+*.keystore
