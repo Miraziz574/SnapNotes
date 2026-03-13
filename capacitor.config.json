@@ -1,7 +1,7 @@
 {
   "appId": "com.quicknotes.app",
   "appName": "QuickNotes",
-  "webDir": "dist",
+  "webDir": "frontend/dist",
   "bundledWebRuntime": false,
   "server": {
     "androidScheme": "https"
