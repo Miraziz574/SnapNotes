@@ -1,0 +1,88 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+android {
+    namespace 'com.quicknotes.app'
+    compileSdkVersion 34
+    defaultConfig {
+        applicationId 'com.quicknotes.app'
+        minSdkVersion 26
+        targetSdkVersion 34
+        versionCode 1
+        versionName '1.0.0'
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+    signingConfigs {
+        release {
+            // Set these via environment variables or local.properties for CI/CD.
+            // Build will fail fast with a clear error if KEYSTORE_FILE is not configured.
+            def keystoreFilePath = project.findProperty('KEYSTORE_FILE')
+            if (keystoreFilePath) {
+                storeFile     file(keystoreFilePath)
+                storePassword project.findProperty('KEYSTORE_PASSWORD') ?: ''
+                keyAlias      project.findProperty('KEY_ALIAS')          ?: 'quicknotes'
+                keyPassword   project.findProperty('KEY_PASSWORD')       ?: ''
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Only apply signingConfig if the keystore was configured
+            if (signingConfigs.release.storeFile) {
+                signingConfig signingConfigs.release
+            }
+        }
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-debug'
+            debuggable true
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    // Capacitor core
+    implementation 'com.capacitorjs:core:5.5.1'
+
+    // Capacitor official plugins
+    implementation 'com.capacitorjs:camera:5.0.9'
+    implementation 'com.capacitorjs:filesystem:5.1.4'
+    implementation 'com.capacitorjs:local-notifications:5.0.7'
+    implementation 'com.capacitorjs:splash-screen:5.0.7'
+    implementation 'com.capacitorjs:keyboard:5.0.8'
+    implementation 'com.capacitorjs:haptics:5.0.7'
+    implementation 'com.capacitorjs:share:5.0.7'
+
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
