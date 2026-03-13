@@ -1,1 +1,18 @@
-{\n  "name": "QuickNotes",\n  "version": "1.0.0",\n  "description": "A new note-taking application",\n  "main": "index.js",\n  "scripts": {\n    "test": "echo 'Error: no test specified' && exit 1"\n  },\n  "author": "Your Name",\n  "license": "ISC"\n}
+{
+  "name": "SnapNotes",
+  "version": "1.0.0",
+  "description": "A note-taking application with AI-powered image analysis",
+  "main": "index.js",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "install:all": "npm install --workspaces",
+    "dev": "npm run dev --workspace=frontend & npm run dev --workspace=backend",
+    "start": "npm run start --workspace=backend",
+    "test": "echo 'Error: no test specified' && exit 1"
+  },
+  "author": "Your Name",
+  "license": "ISC"
+}
