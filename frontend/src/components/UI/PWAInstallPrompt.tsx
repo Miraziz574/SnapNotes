@@ -85,7 +85,7 @@ export function PWAInstallPrompt() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
-              Install SnapNotes
+              Install QuickNotes
             </div>
             <div className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
               Add to home screen for offline access

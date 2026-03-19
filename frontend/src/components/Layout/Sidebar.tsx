@@ -65,7 +65,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}>
               <StickyNote size={16} className="text-white" />
             </div>
-            <span className="text-base font-bold" style={{ color: 'var(--color-text)' }}>SnapNotes</span>
+            <span className="text-base font-bold" style={{ color: 'var(--color-text)' }}>QuickNotes</span>
           </div>
           <button className="md:hidden p-1 rounded-lg hover:bg-black/5" onClick={onClose}>
             <X size={18} style={{ color: 'var(--color-text-secondary)' }} />

@@ -42,7 +42,7 @@ export function SettingsPage({ onMenuClick }: SettingsPageProps) {
 
   const handleExport = () => {
     const data = exportData();
-    exportAsJSON(data, `snapnotes-backup-${new Date().toISOString().slice(0, 10)}.json`);
+    exportAsJSON(data, `quicknotes-backup-${new Date().toISOString().slice(0, 10)}.json`);
     addToast('Data exported successfully!');
   };
 
@@ -206,7 +206,7 @@ export function SettingsPage({ onMenuClick }: SettingsPageProps) {
               <Info size={20} className="text-white" />
             </div>
             <div>
-              <div className="font-semibold" style={{ color: 'var(--color-text)' }}>SnapNotes</div>
+              <div className="font-semibold" style={{ color: 'var(--color-text)' }}>QuickNotes</div>
               <div className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>Version 1.0.0</div>
             </div>
           </div>
