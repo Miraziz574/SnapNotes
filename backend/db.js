@@ -1,6 +1,6 @@
 import Database from 'better-sqlite3'
 
-const db = new Database('./snapnotes.db')
+const db = new Database('./quicknotes.db')
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS notes (
