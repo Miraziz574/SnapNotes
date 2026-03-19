@@ -422,7 +422,7 @@ export const useNotesStore = create<NotesState>()(
       },
     }),
     {
-      name: 'quicknotes-storage',
+      name: 'snapnotes-storage',
       partialize: (state) => ({
         notes: state.notes,
         folders: state.folders,

@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons/*.png'],
       manifest: {
-        name: 'QuickNotes',
-        short_name: 'QuickNotes',
+        name: 'SnapNotes',
+        short_name: 'SnapNotes',
         description: 'A beautiful, fast note-taking app with OCR',
         theme_color: '#007AFF',
         background_color: '#ffffff',
