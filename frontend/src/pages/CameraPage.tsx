@@ -1,9 +1,10 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Upload, X, Check, RefreshCw, Zap } from 'lucide-react';
-import { useOCR } from '../hooks/useOCR';
+import { Camera, Upload, X, Check, Zap } from 'lucide-react';
 import { useNotesStore } from '../store/notesStore';
-import { autoTag, suggestSubject } from '../utils/aiUtils';
+import { autoTag } from '../utils/aiUtils';
+import { captureImageWithAI } from '../utils/imageProcessing';
+import { apiUrl } from '../utils/api';
 import { Button } from '../components/UI/Button';
 import { LoadingSpinner } from '../components/UI/LoadingSpinner';
 import { Header } from '../components/Layout/Header';
@@ -15,12 +16,14 @@ interface CameraPageProps {
 export function CameraPage({ onMenuClick }: CameraPageProps) {
   const navigate = useNavigate();
   const { addNote, addToast } = useNotesStore();
-  const { processImage, isProcessing, progress, error } = useOCR();
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [capturedFile, setCapturedFile] = useState<File | Blob | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [extractedText, setExtractedText] = useState('');
-  const [confidence, setConfidence] = useState<number | null>(null);
-  const [isCameraActive, setIsCameraActive] = useState(false);
   const [noteTitle, setNoteTitle] = useState('');
+  const [noteSubject, setNoteSubject] = useState('');
+  const [aiImageFilename, setAiImageFilename] = useState<string | null>(null);
+  const [isCameraActive, setIsCameraActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -56,26 +59,34 @@ export function CameraPage({ onMenuClick }: CameraPageProps) {
     canvas.getContext('2d')?.drawImage(videoRef.current, 0, 0);
     const imageData = canvas.toDataURL('image/jpeg', 0.9);
     setCapturedImage(imageData);
+    canvas.toBlob((blob) => {
+      if (blob) setCapturedFile(blob);
+    }, 'image/jpeg', 0.9);
     stopCamera();
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setCapturedFile(file);
     const reader = new FileReader();
     reader.onload = (ev) => setCapturedImage(ev.target?.result as string);
     reader.readAsDataURL(file);
   };
 
-  const runOCR = async () => {
-    if (!capturedImage) return;
-    const result = await processImage(capturedImage);
-    if (result) {
-      setExtractedText(result.text);
-      setConfidence(result.confidence);
-      if (!noteTitle) setNoteTitle('Captured Note');
-    } else if (error) {
-      addToast(`OCR error: ${error}`, 'error');
+  const analyzeWithAI = async () => {
+    if (!capturedFile) return;
+    setIsProcessing(true);
+    try {
+      const result = await captureImageWithAI(capturedFile);
+      setExtractedText(result.content);
+      setNoteTitle(result.title);
+      setNoteSubject(result.subject);
+      setAiImageFilename(result.imageFilename ?? null);
+    } catch (err) {
+      addToast(err instanceof Error ? err.message : 'AI analysis failed', 'error');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -84,28 +95,34 @@ export function CameraPage({ onMenuClick }: CameraPageProps) {
       addToast('No text to save', 'warning');
       return;
     }
-    const subject = suggestSubject(noteTitle, extractedText);
     const tags = autoTag(noteTitle, extractedText);
+    const images = aiImageFilename
+      ? [apiUrl(`/uploads/${aiImageFilename}`)]
+      : capturedImage
+      ? [capturedImage]
+      : [];
     const note = addNote({
-      title: noteTitle || 'Captured Note',
+      title: noteTitle || 'AI Captured Note',
       content: extractedText,
-      subject,
+      subject: noteSubject || 'General',
       folder: 'default',
       tags,
       isPinned: false,
       isStarred: false,
-      images: capturedImage ? [capturedImage] : [],
+      images,
       color: 'default',
     });
-    addToast('Note created from capture! ✨');
+    addToast('Note created from AI capture! ✨');
     navigate(`/notes/${note.id}`);
   };
 
   const reset = () => {
     setCapturedImage(null);
+    setCapturedFile(null);
     setExtractedText('');
-    setConfidence(null);
     setNoteTitle('');
+    setNoteSubject('');
+    setAiImageFilename(null);
     stopCamera();
   };
 
@@ -134,9 +151,9 @@ export function CameraPage({ onMenuClick }: CameraPageProps) {
                 <div className="w-20 h-20 rounded-2xl mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: 'var(--color-border)' }}>
                   <Camera size={36} style={{ color: 'var(--color-text-secondary)' }} />
                 </div>
-                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text)' }}>Capture & Extract Text</h3>
+                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text)' }}>AI Image Capture</h3>
                 <p className="text-sm mb-6" style={{ color: 'var(--color-text-secondary)' }}>
-                  Take a photo of handwritten notes, textbooks, or any document to extract text using OCR.
+                  Take a photo of handwritten notes, textbooks, or any document to extract text using Google Gemini AI.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button onClick={startCamera} icon={<Camera size={16} />} size="lg">
@@ -160,41 +177,28 @@ export function CameraPage({ onMenuClick }: CameraPageProps) {
               </button>
             </div>
 
-            {/* OCR area */}
+            {/* AI Analysis area */}
             {!extractedText && !isProcessing && (
               <div className="card-elevated rounded-2xl p-6 text-center">
                 <Zap size={32} className="mx-auto mb-3" style={{ color: 'var(--color-primary)' }} />
-                <h3 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>Ready to Extract Text</h3>
+                <h3 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>Ready to Analyze</h3>
                 <p className="text-sm mb-4" style={{ color: 'var(--color-text-secondary)' }}>
-                  Click below to run OCR and extract text from your image.
+                  Click below to send the image to Google Gemini AI and extract text automatically.
                 </p>
-                <Button onClick={runOCR} icon={<Zap size={16} />} size="lg">
-                  Extract Text
+                <Button onClick={analyzeWithAI} icon={<Zap size={16} />} size="lg">
+                  Analyze with AI
                 </Button>
               </div>
             )}
 
             {isProcessing && (
               <div className="card-elevated rounded-2xl p-8">
-                <LoadingSpinner size="lg" message={`Processing... ${progress}%`} />
-                <div className="mt-3 h-2 rounded-full overflow-hidden mx-4" style={{ backgroundColor: 'var(--color-border)' }}>
-                  <div className="h-full rounded-full bg-blue-500 transition-all duration-300" style={{ width: `${progress}%` }} />
-                </div>
+                <LoadingSpinner size="lg" message="Analyzing with AI..." />
               </div>
             )}
 
             {extractedText && (
               <div className="space-y-4 animate-fade-in">
-                {/* Confidence badge */}
-                {confidence !== null && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>Confidence:</span>
-                    <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${confidence > 70 ? 'bg-green-100 text-green-700' : confidence > 40 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
-                      {confidence}%
-                    </span>
-                  </div>
-                )}
-
                 {/* Title input */}
                 <div>
                   <label className="text-sm font-medium mb-1 block" style={{ color: 'var(--color-text-secondary)' }}>Note Title</label>
@@ -203,6 +207,19 @@ export function CameraPage({ onMenuClick }: CameraPageProps) {
                     value={noteTitle}
                     onChange={(e) => setNoteTitle(e.target.value)}
                     placeholder="Give this note a title..."
+                    className="w-full px-3 py-2 rounded-xl border outline-none text-sm"
+                    style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
+                  />
+                </div>
+
+                {/* Subject input */}
+                <div>
+                  <label className="text-sm font-medium mb-1 block" style={{ color: 'var(--color-text-secondary)' }}>Subject</label>
+                  <input
+                    type="text"
+                    value={noteSubject}
+                    onChange={(e) => setNoteSubject(e.target.value)}
+                    placeholder="Subject or topic..."
                     className="w-full px-3 py-2 rounded-xl border outline-none text-sm"
                     style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
                   />
@@ -223,8 +240,8 @@ export function CameraPage({ onMenuClick }: CameraPageProps) {
                   <Button onClick={saveAsNote} icon={<Check size={16} />} size="lg" className="flex-1">
                     Save as Note
                   </Button>
-                  <Button onClick={runOCR} variant="secondary" icon={<RefreshCw size={16} />}>
-                    Re-run OCR
+                  <Button onClick={analyzeWithAI} variant="secondary" icon={<Zap size={16} />}>
+                    Re-analyze
                   </Button>
                   <Button onClick={reset} variant="ghost" icon={<X size={16} />}>
                     Reset

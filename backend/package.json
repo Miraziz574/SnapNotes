@@ -1,5 +1,5 @@
 {
-  "name": "snapnotes-backend",
+  "name": "quicknotes-backend",
   "version": "1.0.0",
   "type": "module",
   "scripts": {

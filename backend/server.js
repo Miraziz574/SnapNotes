@@ -29,5 +29,5 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.listen(PORT, () => {
-  console.log(`SnapNotes backend running on port ${PORT}`)
+  console.log(`QuickNotes backend running on port ${PORT}`)
 })
