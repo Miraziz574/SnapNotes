@@ -2,6 +2,14 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Note, Folder, AppSettings, Toast, SearchFilters, ViewMode } from '../types';
 
+// One-time migration: move data from old 'snapnotes-storage' key to 'quicknotes-storage'
+const OLD_STORAGE_KEY = 'snapnotes-storage';
+const NEW_STORAGE_KEY = 'quicknotes-storage';
+if (localStorage.getItem(OLD_STORAGE_KEY) && !localStorage.getItem(NEW_STORAGE_KEY)) {
+  localStorage.setItem(NEW_STORAGE_KEY, localStorage.getItem(OLD_STORAGE_KEY)!);
+  localStorage.removeItem(OLD_STORAGE_KEY);
+}
+
 const SAMPLE_NOTES: Note[] = [
   {
     id: 'sample-1',
@@ -422,7 +430,7 @@ export const useNotesStore = create<NotesState>()(
       },
     }),
     {
-      name: 'snapnotes-storage',
+      name: 'quicknotes-storage',
       partialize: (state) => ({
         notes: state.notes,
         folders: state.folders,

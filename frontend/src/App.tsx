@@ -28,7 +28,7 @@ function OnboardingModal() {
         style={{ backgroundColor: 'var(--color-surface)' }}>
         <div className="text-center mb-6">
           <div className="text-6xl mb-4">📝</div>
-          <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>Welcome to SnapNotes!</h2>
+          <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>Welcome to QuickNotes!</h2>
           <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
             Your beautiful, smart note-taking companion.
           </p>
