@@ -1,5 +1,5 @@
 {
-  "name": "SnapNotes",
+  "name": "snapnotes",
   "version": "1.0.0",
   "description": "A note-taking application with AI-powered image analysis",
   "main": "index.js",

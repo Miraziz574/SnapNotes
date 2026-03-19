@@ -7,7 +7,7 @@
     "distDir": "../frontend/dist"
   },
   "package": {
-    "productName": "QuickNotes",
+    "productName": "SnapNotes",
     "version": "1.0.0"
   },
   "tauri": {
@@ -49,7 +49,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.quicknotes.app",
+      "identifier": "com.snapnotes.app",
       "longDescription": "A fast, lightweight notes app for capturing your ideas.",
       "macOS": {
         "entitlements": null,
@@ -84,7 +84,7 @@
         "fullscreen": false,
         "height": 700,
         "resizable": true,
-        "title": "QuickNotes",
+        "title": "SnapNotes",
         "width": 1100,
         "minWidth": 800,
         "minHeight": 500,

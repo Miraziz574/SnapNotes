@@ -1,6 +1,6 @@
 {
-  "appId": "com.quicknotes.app",
-  "appName": "QuickNotes",
+  "appId": "com.snapnotes.app",
+  "appName": "SnapNotes",
   "webDir": "frontend/dist",
   "bundledWebRuntime": false,
   "server": {
