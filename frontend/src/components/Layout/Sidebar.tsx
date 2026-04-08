@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   StickyNote, LayoutDashboard, Search, Camera, Settings,
-  Plus, Folder, Star, Pin, ChevronRight, ChevronDown, X, FolderPlus
+  Plus, Folder, Star, Pin, ChevronRight, ChevronDown, X, FolderPlus, LogOut
 } from 'lucide-react';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../utils/firebase';
 import { useNotesStore } from '../../store/notesStore';
 
 interface SidebarProps {
@@ -42,6 +44,15 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     setShowFolderInput(false);
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      addToast('Signed out successfully');
+    } catch (error) {
+      addToast('Error signing out', 'error');
+    }
+  };
+
   const navItems = [
     { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/notes', icon: StickyNote, label: 'All Notes' },
@@ -58,155 +69,186 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   return (
     <>
       <div className={`sidebar-overlay ${isOpen ? 'show' : ''}`} onClick={onClose} />
-      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
-        {/* Logo */}
-        <div className="p-5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}>
-              <StickyNote size={16} className="text-white" />
-            </div>
-            <span className="text-base font-bold" style={{ color: 'var(--color-text)' }}>QuickNotes</span>
+      <aside className={`sidebar flex flex-col ${isOpen ? 'open' : ''}`}> 
+        <div className="flex-1 overflow-y-auto"> 
+          {/* Logo */} 
+          <div className="p-5 flex items-center justify-between"> 
+            <div className="flex items-center gap-2"> 
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}> 
+                <StickyNote size={16} className="text-white" /> 
+              </div> 
+              <span className="text-base font-bold" style={{ color: 'var(--color-text)' }}>QuickNotes</span> 
+            </div> 
+            <button className="md:hidden p-1 rounded-lg hover:bg-black/5" onClick={onClose}> 
+              <X size={18} style={{ color: 'var(--color-text-secondary)' }} /> 
+            </button> 
           </div>
-          <button className="md:hidden p-1 rounded-lg hover:bg-black/5" onClick={onClose}>
-            <X size={18} style={{ color: 'var(--color-text-secondary)' }} />
-          </button>
-        </div>
 
-        {/* New Note Button */}
-        <div className="px-4 mb-4">
-          <button
-            onClick={handleNewNote}
-            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-sm font-medium transition-all hover:opacity-90 active:scale-95 shadow-sm"
-            style={{ backgroundColor: 'var(--color-primary)' }}
-          >
-            <Plus size={16} />
-            New Note
-            <span className="ml-auto text-xs opacity-70 hidden lg:block">⌘N</span>
-          </button>
-        </div>
+          {/* New Note Button */} 
+          <div className="px-4 mb-4"> 
+            <button 
+              onClick={handleNewNote} 
+              className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-sm font-medium transition-all hover:opacity-90 active:scale-95 shadow-sm" 
+              style={{ backgroundColor: 'var(--color-primary)' }} 
+            > 
+              <Plus size={16} /> 
+              New Note 
+              <span className="ml-auto text-xs opacity-70 hidden lg:block">⌘N</span> 
+            </button> 
+          </div>
 
-        {/* Nav */}
-        <nav className="px-3 space-y-0.5">
-          {navItems.map(({ to, icon: Icon, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === '/'}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  isActive
-                    ? 'text-white'
-                    : 'hover:bg-black/5'
-                }`
-              }
-              style={({ isActive }) => ({
-                backgroundColor: isActive ? 'var(--color-primary)' : undefined,
-                color: isActive ? 'white' : 'var(--color-text)',
-              })}
-            >
-              <Icon size={18} />
-              {label}
-            </NavLink>
-          ))}
-        </nav>
+          {/* Nav */} 
+          <nav className="px-3 space-y-0.5"> 
+            {navItems.map(({ to, icon: Icon, label }) => (
+              <NavLink 
+                key={to} 
+                to={to} 
+                end={to === '/'} 
+                onClick={onClose} 
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                    isActive
+                      ? 'text-white'
+                      : 'hover:bg-black/5'
+                  }`
+                } 
+                style={({ isActive }) => ({
+                  backgroundColor: isActive ? 'var(--color-primary)' : undefined,
+                  color: isActive ? 'white' : 'var(--color-text)',
+                })} 
+              > 
+                <Icon size={18} /> 
+                {label} 
+              </NavLink> 
+            ))} 
+          </nav>
 
-        {/* Divider */}
-        <div className="mx-4 my-4 h-px" style={{ backgroundColor: 'var(--color-border)' }} />
+          {/* Divider */} 
+          <div className="mx-4 my-4 h-px" style={{ backgroundColor: 'var(--color-border)' }} /> 
 
-        {/* Quick filters */}
-        <div className="px-3 space-y-0.5">
-          <NavLink
-            to="/notes?filter=starred"
-            onClick={onClose}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all hover:bg-black/5"
-            style={{ color: 'var(--color-text)' }}
-          >
-            <Star size={16} className="text-yellow-500" />
-            Starred
-            <span className="ml-auto text-xs px-1.5 py-0.5 rounded-md" style={{ backgroundColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}>
-              {notes.filter(n => n.isStarred).length}
-            </span>
-          </NavLink>
-          <NavLink
-            to="/notes?filter=pinned"
-            onClick={onClose}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all hover:bg-black/5"
-            style={{ color: 'var(--color-text)' }}
-          >
-            <Pin size={16} className="text-blue-500" />
-            Pinned
-            <span className="ml-auto text-xs px-1.5 py-0.5 rounded-md" style={{ backgroundColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}>
-              {notes.filter(n => n.isPinned).length}
-            </span>
-          </NavLink>
-        </div>
+          {/* Quick filters */} 
+          <div className="px-3 space-y-0.5"> 
+            <NavLink 
+              to="/notes?filter=starred" 
+              onClick={onClose} 
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all hover:bg-black/5" 
+              style={{ color: 'var(--color-text)' }} 
+            > 
+              <Star size={16} className="text-yellow-500" /> 
+              Starred 
+              <span className="ml-auto text-xs px-1.5 py-0.5 rounded-md" style={{ backgroundColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}>
+                {notes.filter(n => n.isStarred).length}
+              </span> 
+            </NavLink> 
+            <NavLink 
+              to="/notes?filter=pinned" 
+              onClick={onClose} 
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all hover:bg-black/5" 
+              style={{ color: 'var(--color-text)' }} 
+            > 
+              <Pin size={16} className="text-blue-500" /> 
+              Pinned 
+              <span className="ml-auto text-xs px-1.5 py-0.5 rounded-md" style={{ backgroundColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}>
+                {notes.filter(n => n.isPinned).length}
+              </span> 
+            </NavLink> 
+          </div>
 
-        {/* Divider */}
-        <div className="mx-4 my-4 h-px" style={{ backgroundColor: 'var(--color-border)' }} />
+          {/* Divider */} 
+          <div className="mx-4 my-4 h-px" style={{ backgroundColor: 'var(--color-border)' }} /> 
 
-        {/* Folders */}
-        <div className="px-3">
-          <button
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all hover:bg-black/5 mb-1"
-            style={{ color: 'var(--color-text-secondary)' }}
-            onClick={() => setFoldersExpanded(!foldersExpanded)}
-          >
-            {foldersExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            FOLDERS
-            <button
-              className="ml-auto p-0.5 rounded hover:text-blue-500"
-              onClick={(e) => { e.stopPropagation(); setShowFolderInput(true); setFoldersExpanded(true); }}
-            >
-              <FolderPlus size={14} />
+          {/* Folders */} 
+          <div className="px-3"> 
+            <button 
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all hover:bg-black/5 mb-1" 
+              style={{ color: 'var(--color-text-secondary)' }} 
+              onClick={() => setFoldersExpanded(!foldersExpanded)} 
+            > 
+              {foldersExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />} 
+              FOLDERS 
+              <button 
+                className="ml-auto p-0.5 rounded hover:text-blue-500" 
+                onClick={(e) => { e.stopPropagation(); setShowFolderInput(true); setFoldersExpanded(true); }} 
+              > 
+                <FolderPlus size={14} /> 
+              </button> 
             </button>
-          </button>
 
-          {foldersExpanded && (
-            <div className="space-y-0.5 animate-fade-in">
-              {folders.map((folder) => (
-                <NavLink
-                  key={folder.id}
-                  to={folder.id === 'default' ? '/notes' : `/notes?folder=${folder.id}`}
-                  onClick={onClose}
-                  className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all hover:bg-black/5"
-                  style={{ color: 'var(--color-text)' }}
-                >
-                  <Folder size={16} style={{ color: folder.color }} />
-                  <span className="flex-1 truncate">{folder.name}</span>
-                  <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-                    {noteCountForFolder(folder.id)}
-                  </span>
-                </NavLink>
-              ))}
+            {foldersExpanded && (
+              <div className="space-y-0.5 animate-fade-in"> 
+                {folders.map((folder) => (
+                  <NavLink 
+                    key={folder.id} 
+                    to={folder.id === 'default' ? '/notes' : `/notes?folder=${folder.id}`} 
+                    onClick={onClose} 
+                    className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all hover:bg-black/5" 
+                    style={{ color: 'var(--color-text)' }} 
+                  > 
+                    <Folder size={16} style={{ color: folder.color }} /> 
+                    <span className="flex-1 truncate">{folder.name}</span> 
+                    <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                      {noteCountForFolder(folder.id)}
+                    </span> 
+                  </NavLink> 
+                ))}
 
-              {showFolderInput && (
-                <div className="flex gap-1 px-1 py-1 animate-fade-in">
-                  <input
-                    autoFocus
-                    type="text"
-                    value={newFolderName}
-                    onChange={(e) => setNewFolderName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleAddFolder();
-                      if (e.key === 'Escape') { setShowFolderInput(false); setNewFolderName(''); }
-                    }}
-                    placeholder="Folder name..."
-                    className="flex-1 px-2 py-1 rounded-lg text-sm outline-none border"
-                    style={{ backgroundColor: 'var(--color-bg)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
-                  />
-                  <button onClick={handleAddFolder} className="px-2 py-1 rounded-lg bg-blue-500 text-white text-xs">
-                    Add
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+                {showFolderInput && (
+                  <div className="flex gap-1 px-1 py-1 animate-fade-in"> 
+                    <input 
+                      autoFocus 
+                      type="text" 
+                      value={newFolderName} 
+                      onChange={(e) => setNewFolderName(e.target.value)} 
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleAddFolder();
+                        if (e.key === 'Escape') { setShowFolderInput(false); setNewFolderName(''); }
+                      }} 
+                      placeholder="Folder name..." 
+                      className="flex-1 px-2 py-1 rounded-lg text-sm outline-none border" 
+                      style={{ backgroundColor: 'var(--color-bg)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }} 
+                    /> 
+                    <button onClick={handleAddFolder} className="px-2 py-1 rounded-lg bg-blue-500 text-white text-xs"> 
+                      Add 
+                    </button> 
+                  </div> 
+                )} 
+              </div> 
+            )} 
+          </div> 
+          
+          <div className="h-8" /> 
+        </div> 
 
-        {/* Bottom spacer */}
-        <div className="h-8" />
-      </aside>
+        {/* Account Info & Sign Out Section */} 
+        <div className="p-4 mt-auto border-t" style={{ borderColor: 'var(--color-border)' }}> 
+          {auth.currentUser && ( 
+            <div className="flex items-center gap-3 mb-4 px-2"> 
+              {auth.currentUser.photoURL ? ( 
+                <img src={auth.currentUser.photoURL} alt="Profile" className="w-8 h-8 rounded-full" /> 
+              ) : ( 
+                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm font-bold text-gray-700"> 
+                  {auth.currentUser.email?.[0].toUpperCase()} 
+                </div> 
+              )} 
+              <div className="flex flex-col overflow-hidden"> 
+                <span className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}> 
+                  {auth.currentUser.displayName || 'User'} 
+                </span> 
+                <span className="text-xs truncate" style={{ color: 'var(--color-text-secondary)' }}> 
+                  {auth.currentUser.email} 
+                </span> 
+              </div> 
+            </div> 
+          )} 
+          <button 
+            onClick={handleSignOut} 
+            className="w-full flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-red-50 hover:text-red-600 text-red-500" 
+          > 
+            <LogOut size={16} /> 
+            Sign Out 
+          </button> 
+        </div> 
+      </aside> 
     </>
   );
 }
