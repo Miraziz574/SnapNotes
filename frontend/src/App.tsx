@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { onAuthStateChanged, type User } from 'firebase/auth';
+import { auth } from './utils/firebase';
 import { Dashboard } from './pages/Dashboard';
 import { NotesPage } from './pages/NotesPage';
 import { NoteEditor } from './pages/NoteEditor';
@@ -14,6 +16,8 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useNotesStore } from './store/notesStore';
 import { Button } from './components/UI/Button';
 import { PWAInstallPrompt } from './components/UI/PWAInstallPrompt';
+import { Login } from './components/Auth/Login';
+import { LoadingSpinner } from './components/UI/LoadingSpinner';
 
 const queryClient = new QueryClient();
 
@@ -86,6 +90,33 @@ function AppLayout() {
 }
 
 function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <ThemeProvider>
+        <Login />
+      </ThemeProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter basename={import.meta.env.BASE_URL}>
