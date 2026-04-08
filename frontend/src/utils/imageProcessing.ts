@@ -1,4 +1,7 @@
-import { apiUrl } from './api';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+// Initialize Gemini directly on the frontend
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 export interface CaptureResult {
   title: string;
@@ -7,53 +10,47 @@ export interface CaptureResult {
   imageFilename?: string;
 }
 
-/**
- * Sends an image file or blob to the backend `/api/notes/capture` endpoint,
- * which uses Google Gemini AI to extract text and identify the subject.
- *
- * Returns structured note data ready to be added to the Zustand store.
- */
-export async function captureImageWithAI(image: File | Blob): Promise<CaptureResult> {
-  const formData = new FormData();
-  const filename =
-    image instanceof File && image.name
-      ? image.name
-      : `capture.${image.type.split('/')[1] || 'jpg'}`;
-  formData.append('photo', image, filename);
+export async function captureImageWithAI(file: File | Blob): Promise<CaptureResult> {
+  try {
+    // 1. Convert the uploaded file/photo to Base64
+    const base64Data = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = (reader.result as string).split(',')[1];
+        resolve(base64String);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
 
-  const response = await fetch(apiUrl('/api/notes/capture'), {
-    method: 'POST',
-    body: formData,
-  });
+    // 2. Send to Gemini 1.5 Flash
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const prompt = 'Extract all handwritten text from this image. Return a JSON object with fields: "text" (the extracted text), "title" (a short 3-4 word title based on the content), and "subject" (the identified subject/topic, default to General).';
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({})) as { error?: string };
-    throw new Error(err.error || `Server error: ${response.status}`);
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          data: base64Data,
+          mimeType: file.type || 'image/jpeg'
+        }
+      }
+    ]);
+
+    // 3. Parse the JSON response
+    let rawText = result.response.text().trim();
+    // Strip markdown formatting if Gemini includes it
+    rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+    
+    const parsed = JSON.parse(rawText);
+    
+    return {
+      content: parsed.text || '',
+      title: parsed.title || 'New Scanned Note',
+      subject: parsed.subject || 'General'
+    };
+  } catch (error) {
+    console.error('Error processing image with Gemini:', error);
+    throw new Error('Failed to extract text from the image. Please try again.');
   }
-
-  const data = await response.json() as {
-    id: number;
-    text: string;
-    subject: string;
-    timestamp: string;
-    image_filename: string | null;
-  };
-
-  const text: string = data.text || '';
-  const subject: string = data.subject || 'General';
-
-  // Derive title from the first meaningful line of extracted text (max 60 chars),
-  // falling back to "<Subject> Notes".
-  const firstLine = text.split('\n').find((l) => l.trim().length > 0)?.trim() ?? '';
-  const title =
-    firstLine.length > 0 && firstLine.length <= 60
-      ? firstLine
-      : `${subject} Notes`;
-
-  return {
-    title,
-    content: text,
-    subject,
-    imageFilename: data.image_filename ?? undefined,
-  };
 }
